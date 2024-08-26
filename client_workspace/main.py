@@ -7,6 +7,9 @@ print(os.getcwd())  # Prints the current working directory
 
 # Set up the app
 hdrs = (
+    picolink,
+    Script(src="https://cdn.tailwindcss.com"),
+    Link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css"),
     Link(rel="stylesheet", href="/static/styles.css"),
 )
 app = FastHTML(hdrs=hdrs)
