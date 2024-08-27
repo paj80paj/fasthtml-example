@@ -34,7 +34,7 @@ def app_tile(title, description, action, href="#", icon_path=""):
     )
 
 def sidebar():
-    return Div(cls="sidebar bg-blue-800 p-4 min-h-screen flex flex-col items-center text-white")(
+    return Div(cls="sidebar bg-dark-navy p-4 min-h-screen flex flex-col items-center text-white")(
         Img(src="/static/Alpha Enhancer2.png", cls="mb-4 w-8 h-8"),
         Img(src="/static/commentary2.png", cls="mb-4 w-8 h-8"),
         Img(src="/static/Compliance2.png", cls="mb-4 w-8 h-8"),
@@ -60,7 +60,7 @@ def index():
         sidebar(),
         Div(cls="container mx-auto p-6 bg-gray-100")(
             Div(cls="flex justify-between items-center mb-4")(
-                H1("Client Workspace", cls="text-4xl font-bold text-center")
+                H1("Client Workspace", cls="text-4xl font-bold text-center text-dark-navy")
             ),
             Div(cls="main-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8")(
                 app_tile("ClientComm", "An AI powered digital assistant, combining natural language processing with advanced machine learning.", "Open", href="/clientcomm", icon_path="/static/Client Comm1.png"),
