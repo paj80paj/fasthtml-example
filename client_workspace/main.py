@@ -84,13 +84,13 @@ def clientcomm():
                         cls="flex justify-between items-center",
                     )
                 ),
-                Div(cls="chat-tabs mb-4")(
-                    Div(cls="tab tab-active", id="recent-tab")("Recent Questions"),
-                    Div(cls="tab", id="common-tab")("Ideas for Questions")
-                ),
+                # Div(cls="chat-tabs mb-4")(
+                #     Div(cls="tab tab-active", id="recent-tab")("Recent Questions"),
+                #     Div(cls="tab", id="common-tab")("Ideas for Questions")
+                # ),
                 Div(cls="chat-suggestions")(  # Changed according to feedback
-                    P("Here are some ideas for questions:", cls="mb-2"),
-                    Ul(cls="list-disc pl-5")(
+                    P("Suggested client talking points", cls="mb-2 font-bold"),
+                    Ul(cls="list-disc pl-5 italic")(
                         Li("Are you still worried about the market volatility?"),
                         Li("Congratulations on the baby!"),
                         Li("How are you getting on with the tax discussion?")
@@ -102,8 +102,10 @@ def clientcomm():
                 )
             )
         ),
+            Div(cls="absolute right-0 mt-2 mr-4")(
+                A("Back to Client Workspace", href="/", cls="btn btn-secondary")
+            ),
         Div(cls="w-1/2 mb-8 relative")(
-            A("Back to Client Workspace", href="/", cls="btn btn-secondary absolute right-0 mt-4 mr-4"),  # Link as a button
             H2("Upcoming Meeting", cls="text-2xl font-bold mb-4"),
             P("Heads up! You have a meeting with *John Doe* in an hour. Here are some things to note:", cls="mb-2"),
             Ul(cls="list-disc pl-5")(
@@ -118,7 +120,6 @@ def clientcomm():
         )
     )
     return Titled('ClientComm', page)
-
 @app.ws('/wscon')
 async def ws(msg: str, send):
     if msg.strip():
