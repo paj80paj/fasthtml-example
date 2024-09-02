@@ -81,7 +81,7 @@ def clientcomm():
     page = Div(cls="flex bg-white min-h-screen")(
         sidebar(),
         Div(cls="container", data_theme="corporate")(
-            Div(cls="absolute right-0 top-0 mt-4 mr-4")(
+            Div(cls="absolute right-0 top-0 mt-4 mr-4 ")(
                 A("Back", href="/", cls="btn bg-blue-800 text-white")
             ),
             H2("Client Comms", cls="text-3xl font-bold mb-4"),
@@ -106,7 +106,7 @@ def clientcomm():
                 ),
                 Div(cls="w-1/2 mb-8 relative")(
                     H2("Upcoming Meeting", cls="text-2xl font-bold mb-4"),
-                    P("Heads up! You have a meeting with *John Doe* in an hour. Here are some things to note:", cls="mb-2"),
+                    P("You have a meeting with *John Doe* at 2pm. Here are some things to note:", cls="mb-2"),
                     Ul(cls="list-disc pl-5 text-sm space-y-4")(
                         Li(Span("Portfolio Alert:", cls="font-bold") + Span(" *Tech Ventures* underperformed by 15% this quarter.")),
                         Li(Span("Unresolved Issue:", cls="font-bold") + Span(" *John Doe* has an open support ticket about tax implications.")),
