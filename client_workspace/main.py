@@ -84,71 +84,52 @@ def clientcomm():
             Div(cls="absolute right-0 top-0 mt-4 mr-4 ")(
                 A("Back", href="/", cls="btn bg-blue-800 text-white")
             ),
-            Div(cls="flex flex-1 justify-center py-5 px-6 gap-1")(
-                # Left side - Chat container
+            Div(cls="flex flex-1 py-5 px-6 gap-6")(
+                # Left side - Client info, Chat button, and Chat container
                 Div(cls="layout-content-container flex flex-col w-80")(
-                    Div(cls="flex h-full min-h-[700px] flex-col justify-between bg-white p-4")(
-                        Div(cls="chat-container mt-4")(
-                            Div(cls="chat-input mb-4")(
-                                Form(
-                                    Div(cls="flex items-center")(
-                                        ChatInput(),
-                                        Button("Go!", cls="btn bg-blue-800 text-white ml-2")
-                                    ),
-                                    ws_send=True, hx_ext="ws", ws_connect="/wscon",
-                                    cls="flex justify-between items-center",
-                                )
-                            ),
-                        ),
-                        Div(cls="chat-footer mt-4 flex items-center")(
-                            Div(cls="user-icon mr-2")
+                    # Client info at the top left
+                    Div(cls="flex items-center mb-4")(
+                        Div(style='background-image: url("https://cdn.usegalileo.ai/stability/4d0f19f3-b727-4b34-986f-6da507480b2d.png");', 
+                            cls='bg-center bg-no-repeat aspect-square bg-cover rounded-xl min-h-32 w-32 mr-4'),
+                        Div(cls="flex flex-col")(
+                            P("John Doe", cls="text-[#111517] text-[22px] font-bold leading-tight tracking-[-0.015em]"),
+                            P("Age 50, Male", cls="text-[#647987] text-base font-normal leading-normal"),
+                            P("Primary client", cls="text-[#647987] text-base font-normal leading-normal")
                         )
                     ),
-                    Div(cls="flex p-4 @container")(
-                        Div(cls="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between")(
-                            Div(cls="flex gap-4")(
-                                Div(style='background-image: url("https://cdn.usegalileo.ai/stability/4d0f19f3-b727-4b34-986f-6da507480b2d.png");', cls='bg-center bg-no-repeat aspect-square bg-cover rounded-xl min-h-32 w-32'),
-                                Div(cls="flex flex-col")(
-                                    P("John Doe", cls="text-[#111517] text-[22px] font-bold leading-tight tracking-[-0.015em]"),
-                                    P("Age 50, Male", cls="text-[#647987] text-base font-normal leading-normal"),
-                                    P("Primary client", cls="text-[#647987] text-base font-normal leading-normal")
-                                )
-                            )
-                        )
+                    # Chat container
+                    Div(cls="flex-grow overflow-y-auto mb-4 border rounded p-2", style="height: 300px;")(
+                        Div(id="chat-messages")
                     ),
-                    Div(cls="flex px-4 py-3")(
-                        Button("Chat with WealthAI", cls="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 flex-1 bg-[#1d8cd7] text-white text-sm font-bold leading-normal tracking-[0.015em]")
-                    ),
-                    # Existing chat messages
-                    Div(id="chatlist", cls="chat-messages")
+                    # Chat input
+                    Form(cls="flex", hx_post="/chat", hx_target="#chat-messages", hx_swap="beforeend")(
+                        Input(type="text", name="message", placeholder="Ask Algernon anything", cls="flex-grow p-2 border rounded-l"),
+                        Button("Send", type="submit", cls="bg-blue-500 text-white p-2 rounded-r")
+                    )
                 ),
                 # Right side - Meeting preparation
                 Div(cls="layout-content-container flex flex-col max-w-[960px] flex-1")(
-                    Div(cls="flex flex-wrap justify-between gap-3 p-4")(
-                        Div(cls="flex min-w-72 flex-col gap-3")(
-                            P("Prepare for client meeting", cls="text-[#111517] tracking-light text-[32px] font-bold leading-tight"),
-                            P("Next meeting: May 14, 2023", cls="text-[#647987] text-sm font-normal leading-normal")
-                        )
-                    ),
-                    H2("Meeting items", cls="text-[#111517] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"),
+                    H1("Prepare for client meeting", cls="text-4xl font-bold text-center text-dark-navy mb-4"),
+                    P("Next meeting: May 14, 2023", cls="text-center mb-6"),
                     # Meeting items
-                    Div(cls="flex flex-col")(
+                    H2("Meeting items", cls="text-2xl font-bold mb-4"),
+                    Div(cls="space-y-4")(
                         meeting_item("Client Actions", "Sign and return the investment agreement."),
-                        meeting_item("Our Actions", "Prepare the quarterly performance report; follow up on pending documentation."),
-                        meeting_item("Changing Circumstances", "Recent marriage may impact financial goals."),
                         meeting_item("Financial Events", "Tax filing deadline on April 15th."),
                         meeting_item("Market Events", "Stock market drop affecting portfolio value."),
                         meeting_item("Regulatory Events", "New pension regulations effective next month."),
                         meeting_item("Insurance Updates", "Life insurance policy review due."),
                         meeting_item("Compliance Alerts", "Portfolio needs adjustment for compliance.")
                     ),
-                    H2("Next steps", cls="text-[#111517] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"),
-                    Div(cls="flex flex-col")(
+                    # Next steps
+                    H2("Next steps", cls="text-2xl font-bold mt-8 mb-4"),
+                    Div(cls="space-y-4")(
                         next_step("Client Actions", "Review and sign the investment agreement"),
                         next_step("Our Actions", "Prepare the quarterly performance report")
                     ),
-                    Div(cls="flex px-4 py-3")(
-                        Button("Record Meeting", cls="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 flex-1 bg-[#1d8cd7] text-white text-base font-bold leading-normal tracking-[0.015em]")
+                    # Record Meeting button
+                    Div(cls="mt-8")(
+                        Button("Record Meeting", cls="w-full bg-blue-500 text-white py-2 rounded")
                     )
                 )
             )
@@ -197,5 +178,16 @@ async def ws(msg: str, send):
         if contents(r).strip():
             messages.append({"role": "assistant", "content": contents(r)})
             await send(Div(ChatMessage(messages[-1]), hx_swap_oob='beforeend', id="chatlist"))
+
+@app.post("/chat")
+def chat(message: str):
+    messages.append({"role": "user", "content": message})
+    r = cli(messages, sp=sp)
+    ai_response = contents(r)
+    messages.append({"role": "assistant", "content": ai_response})
+    return Div(
+        ChatMessage(messages[-2]),  # User message
+        ChatMessage(messages[-1])   # AI response
+    )
 
 serve()
