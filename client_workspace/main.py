@@ -34,7 +34,7 @@ def app_tile(title, description, action, href="#", icon_path=""):
     )
 
 def sidebar():
-    return Div(cls="sidebar bg-dark-navy p-4 min-h-screen flex flex-col items-center text-white")(
+    return Div(cls="sidebar bg-blue-950 p-4 min-h-screen flex flex-col items-center text-white")(
         Img(src="/static/Alpha Enhancer2.png", cls="mb-4 w-8 h-8"),
         Img(src="/static/commentary2.png", cls="mb-4 w-8 h-8"),
         Img(src="/static/Compliance2.png", cls="mb-4 w-8 h-8"),
@@ -103,13 +103,13 @@ def clientcomm():
                     ),
                     # Chat input
                     Form(cls="flex", hx_post="/chat", hx_target="#chat-messages", hx_swap="beforeend")(
-                        Input(type="text", name="message", placeholder="Ask Algernon anything", cls="flex-grow p-2 border rounded-l"),
+                        Input(type="text", name="message", placeholder="Ask WealthAI...", cls="flex-grow p-2 border rounded-l"),
                         Button("Send", type="submit", cls="bg-blue-500 text-white p-2 rounded-r")
                     )
                 ),
                 # Right side - Meeting preparation
                 Div(cls="layout-content-container flex flex-col max-w-[960px] flex-1")(
-                    H1("Prepare for client meeting", cls="text-4xl font-bold text-center text-dark-navy mb-4"),
+                    H1("Client meeting: John Doe", cls="text-4xl font-bold text-center text-dark-navy mb-4"),
                     P("Next meeting: May 14, 2023", cls="text-center mb-6"),
                     # Meeting items
                     H2("Meeting items", cls="text-2xl font-bold mb-4"),
