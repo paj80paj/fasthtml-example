@@ -44,17 +44,28 @@ def get():
         P("Tabs: Organize content into different sections", cls="text-xl font-bold text-black"),
         Div(
             cls="tabs tabs-lifted mb-4",
-            role="tablist",
             contents=[
-                Input(type="radio", name="my_tabs_2", role="tab", cls="tab", checked=True, contents=[
-                    Div("Tab 1", cls="tab-content p-10")
-                ]),
-                Input(type="radio", name="my_tabs_2", role="tab", cls="tab", contents=[
-                    Div("Tab 2", cls="tab-content p-10")
-                ]),
-                Input(type="radio", name="my_tabs_2", role="tab", cls="tab", contents=[
-                    Div("Tab 3", cls="tab-content p-10")
-                ])
+                Div(
+                    Input(type="radio", name="my_tabs_2", cls="tab", checked=True),
+                    Div("Tab 1", cls="tab-content p-10 bg-base-100 rounded-box", contents=[
+                        P("Tab 1 content")
+                    ]),
+                    cls="tab"
+                ),
+                Div(
+                    Input(type="radio", name="my_tabs_2", cls="tab"),
+                    Div("Tab 2", cls="tab-content p-10 bg-base-100 rounded-box", contents=[
+                        P("Tab 2 content")
+                    ]),
+                    cls="tab"
+                ),
+                Div(
+                    Input(type="radio", name="my_tabs_2", cls="tab"),
+                    Div("Tab 3", cls="tab-content p-10 bg-base-100 rounded-box", contents=[
+                        P("Tab 3 content")
+                    ]),
+                    cls="tab"
+                )
             ]
         ),
         
@@ -128,28 +139,75 @@ def get():
         # ===== Carousel =====
         P("Carousel: Slideshow for cycling through images or content", cls="text-xl font-bold text-black"),
         Div(
-            Div(id="slide1", cls="carousel-item relative w-full", contents=[
-                Img(src="https://daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.jpg", cls="w-full"),
-                Div(
-                    A(href="#slide4", cls="btn btn-circle", contents="❮"),
-                    A(href="#slide2", cls="btn btn-circle", contents="❯"),
-                    cls="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
-                )
-            ]),
+            Div(
+                Div(id="slide1", cls="carousel-item relative w-full", contents=[
+                    Img(src="https://daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.jpg", cls="w-full"),
+                    Div(
+                        A(href="#slide4", cls="btn btn-circle", contents="❮"),
+                        A(href="#slide2", cls="btn btn-circle", contents="❯"),
+                        cls="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+                    )
+                ]),
+                Div(id="slide2", cls="carousel-item relative w-full", contents=[
+                    Img(src="https://daisyui.com/images/stock/photo-1609621838510-5ad474b7d25d.jpg", cls="w-full"),
+                    Div(
+                        A(href="#slide1", cls="btn btn-circle", contents="❮"),
+                        A(href="#slide3", cls="btn btn-circle", contents="❯"),
+                        cls="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+                    )
+                ]),
+                Div(id="slide3", cls="carousel-item relative w-full", contents=[
+                    Img(src="https://daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg", cls="w-full"),
+                    Div(
+                        A(href="#slide2", cls="btn btn-circle", contents="❮"),
+                        A(href="#slide4", cls="btn btn-circle", contents="❯"),
+                        cls="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+                    )
+                ]),
+                Div(id="slide4", cls="carousel-item relative w-full", contents=[
+                    Img(src="https://daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.jpg", cls="w-full"),
+                    Div(
+                        A(href="#slide3", cls="btn btn-circle", contents="❮"),
+                        A(href="#slide1", cls="btn btn-circle", contents="❯"),
+                        cls="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+                    )
+                ]),
             cls="carousel w-full"
+            ),
+            cls="mb-4"
         ),
         
         Hr(cls="my-8"),  # Dividing line
         
-        # ===== New components from DaisyUI =====
 
         # ===== Accordion component =====
         P("Accordion: Collapsible content panels", cls="text-xl font-bold text-black"),
         Div(
             Div(
-                Input(type="radio", name="my-accordion-1", checked=True),
-                Div("Click to open this one and close others", cls="collapse-title text-xl font-medium"),
-                Div("Hello, I'm the content inside the accordion", cls="collapse-content"),
+                Input(type="radio", name="my-accordion-1", cls="peer", hidden=True),
+                Label("Click to open this one and close others", cls="collapse-title text-xl font-medium"),
+                Div(
+                    P("Hello, I'm the content inside the first accordion item"),
+                    cls="collapse-content"
+                ),
+                cls="collapse collapse-arrow bg-base-200"
+            ),
+            Div(
+                Input(type="radio", name="my-accordion-1", cls="peer", hidden=True),
+                Label("Click to open this one and close others", cls="collapse-title text-xl font-medium"),
+                Div(
+                    P("Hello, I'm the content inside the second accordion item"),
+                    cls="collapse-content"
+                ),
+                cls="collapse collapse-arrow bg-base-200"
+            ),
+            Div(
+                Input(type="radio", name="my-accordion-1", cls="peer", hidden=True),
+                Label("Click to open this one and close others", cls="collapse-title text-xl font-medium"),
+                Div(
+                    P("Hello, I'm the content inside the third accordion item"),
+                    cls="collapse-content"
+                ),
                 cls="collapse collapse-arrow bg-base-200"
             ),
             cls="mb-4"
@@ -161,8 +219,8 @@ def get():
         P("Avatar: Display user profile images", cls="text-xl font-bold text-black"),
         Div(
             Div(
-                Img(src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"),
-                cls="w-24 rounded-full"
+                Img(src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg", alt="Avatar"),
+                cls="w-24 mask mask-squircle"
             ),
             cls="avatar mb-4"
         ),
@@ -195,8 +253,8 @@ def get():
         P("Breadcrumbs: Show navigation hierarchy", cls="text-xl font-bold text-black"),
         Div(
             Ul(
-                Li(A("Home")),
-                Li(A("Documents")),
+                Li(A("Home", href="#")),
+                Li(A("Documents", href="#")),
                 Li("Add Document"),
                 cls="breadcrumbs text-sm"
             ),
@@ -441,26 +499,10 @@ def get():
 
         cls="p-4 space-y-4"
     )
-
-    # ===== Explanation for one component (Accordion) =====
-    explanation = Div(
-        H2("Accordion Component Explanation", cls="text-2xl font-bold mb-2"),
-        P("The Accordion component is used to create collapsible content panels. It's particularly useful when you want to present a large amount of information in a compact space, allowing users to expand only the sections they're interested in.", cls="text-lg"),
-        P("Use cases for the Accordion component include:", cls="text-lg"),
-        Ul(
-            Li("FAQ sections where questions can be expanded to reveal answers"),
-            Li("Product details pages where different aspects of the product can be collapsed"),
-            Li("Settings menus where options are grouped and can be expanded for more details"),
-            Li("Navigation menus with sub-categories that can be expanded"),
-            cls="list-disc list-inside mb-2"
-        ),
-        P("The Accordion helps improve user experience by reducing clutter and allowing users to focus on specific content as needed."),
-        cls="bg-base-200 p-4 rounded-lg mb-4"
-    )
  
     return Titled("Daisy UI Test",
         Body(
-            Div(content, explanation, cls="min-h-screen"),
+            Div(content, cls="min-h-screen"),
             data_theme="corporate"
         )
     )
