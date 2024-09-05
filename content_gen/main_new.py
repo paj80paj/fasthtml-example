@@ -1,11 +1,28 @@
 from fasthtml.common import *
-from collections import defaultdict
+from collections import defaultdict, Counter
 from fasthtml.common import Div  # Make sure Div is imported
+
+# Global variables for screen names
+DASHBOARD = "Dashboard"
+OUR_STRATEGY = "Our Strategy"  # Changed from COMPANY_STRATEGY
+WORKING_TITLES = "Working Titles"
+OUTLINE = "Outline"  
+FULL_TEXT = "Full Text"  
+REUSE = "Reuse"
+PROMPTS = "Prompts"
+
+# List of main steps
+MAIN_STEPS = [OUR_STRATEGY, WORKING_TITLES, OUTLINE, FULL_TEXT, REUSE]
 
 # Set up the app
 hdrs = (
     Script(src="https://cdn.tailwindcss.com"),
-    Link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css")
+    Link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css"),
+    Script("""
+    function changeTheme(theme) {
+        document.getElementById('theme-wrapper').setAttribute('data-theme', theme);
+    }
+    """)
 )
 app = FastHTML(hdrs=hdrs, ws_hdr=True)
 
@@ -20,20 +37,56 @@ working_titles = [
 
 def create_layout(content):
     sidebar = Div(
-        A("Dashboard", href="/", cls="btn btn-ghost btn-block"),
-        A("Company Strategy", href="/company-strategy", cls="btn btn-ghost btn-block"),
-        A("Working Titles", href="/working-titles", cls="btn btn-ghost btn-block"),
-        A("Outlining", href="/outlining", cls="btn btn-ghost btn-block"),
-        A("Full Text Generation", href="/full-text", cls="btn btn-ghost btn-block"),
-        A("Content Reuse", href="/content-reuse", cls="btn btn-ghost btn-block"),
-        A("Prompts", href="/prompts", cls="btn btn-ghost btn-block"),
+        A(DASHBOARD, href="/", cls="btn btn-ghost btn-block"),
+        A(OUR_STRATEGY, href="/our-strategy", cls="btn btn-ghost btn-block"),
+        A(WORKING_TITLES, href="/working-titles", cls="btn btn-ghost btn-block"),
+        A(OUTLINE, href="/outline", cls="btn btn-ghost btn-block"),
+        A(FULL_TEXT, href="/full-text", cls="btn btn-ghost btn-block"),
+        A(REUSE, href="/reuse", cls="btn btn-ghost btn-block"),
+        A(PROMPTS, href="/prompts", cls="btn btn-ghost btn-block"),
         cls="menu bg-base-200 w-56 p-4"
     )
-    return Div(sidebar, Div(content, cls="flex-1 p-8"), cls="flex min-h-screen bg-base-100", data_theme="corporate")
+    theme_selector = Div(
+        Select(
+            Option("Corporate", value="corporate"),
+            Option("Light", value="light"),
+            Option("Dark", value="dark"),
+            Option("Cupcake", value="cupcake"),
+            Option("Bumblebee", value="bumblebee"),
+            Option("Emerald", value="emerald"),
+            Option("Synthwave", value="synthwave"),
+            cls="select select-bordered w-full max-w-xs",
+            onchange="changeTheme(this.value)"
+        ),
+        cls="fixed bottom-4 right-4"
+    )
+    return Div(
+        sidebar, 
+        Div(content, cls="flex-1 p-8"), 
+        theme_selector,
+        cls="flex min-h-screen bg-base-100", 
+        data_theme="corporate",
+        id="theme-wrapper"
+    )
+
+def create_progress_bar(current_step):
+    steps = ["Our Strategy", "Working Titles", "Outline", "Full Text", "Reuse"]
+    progress_value = (steps.index(current_step) + 1) * 20  # Each step is worth 20%
+    
+    return Div(
+        Ul(
+            *(Li(
+                cls=f"step {'step-primary' if steps.index(step) <= steps.index(current_step) else ''}"
+            ) for step in steps),
+            cls="steps w-full"
+        ),
+        Progress(cls="progress progress-primary w-full", value=str(progress_value), max="100"),
+        cls="mb-8"
+    )
 
 @app.get("/")
 def get():
-    title = "Content Generation Dashboard"
+    title = DASHBOARD
     
     status_count = defaultdict(int)
     theme_count = defaultdict(int)
@@ -58,11 +111,11 @@ def get():
                     contents=[
                         H3(stage.title(), cls="card-title"),
                         P(f"{sum(1 for t in working_titles if t['status'] == stage.lower())} items"),
-                        A(f"Go to {stage.title()}", href=f"/{stage.lower().replace(' ', '-')}", cls="btn btn-primary btn-sm mt-2")
+                        A(f"Go to {stage.title()}", href=f"/{stage.lower().replace(' ', '-')}", cls="btn btn-primary btn-sm mt-2 text-white")
                     ]
                 )
             ]
-        ) for stage in ["Company Strategy", "Working Titles", "Outlining", "Full Text", "Content Reuse"]),
+        ) for stage in MAIN_STEPS),
         cls="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
     )
 
@@ -81,7 +134,7 @@ def get():
                         Div(
                             A("Edit", href=f"/{title['status'].lower().replace(' ', '-')}/{title['id']}", cls="btn btn-sm btn-outline mr-2"),
                             A("View History", href=f"/history/{title['id']}", cls="btn btn-sm btn-outline mr-2"),
-                            A("Next Step", href=f"/next-step/{title['id']}", cls="btn btn-sm btn-primary"),
+                            A("Next Step", href=f"/next-step/{title['id']}", cls="btn btn-sm btn-primary text-white"),
                             cls="mt-4"
                         )
                     ]
@@ -92,7 +145,7 @@ def get():
     )
 
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
+        H1(title, cls="text-4xl font-bold mb-8"),
         progress,
         stage_summaries,
         current_projects,
@@ -101,113 +154,175 @@ def get():
 
     return Titled(title, create_layout(content))
 
-@app.get("/company-strategy")
+@app.get("/our-strategy")
 def get():
-    title = "Company Strategy"
+    title = OUR_STRATEGY
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
-        Form(
+        H1(title, cls="text-4xl font-bold mb-8"),
+        create_progress_bar(OUR_STRATEGY),
+        Div(
             Div(
-                Label("Value Proposition", cls="label"),
-                Textarea(placeholder="Enter your company's value proposition", cls="textarea textarea-bordered w-full"),
-                cls="mb-4"
+                H2("Value Proposition", cls="text-xl font-semibold mb-2"),
+                Textarea(placeholder="Enter your company's value proposition", cls="textarea textarea-bordered w-full h-24"),
+                cls="mb-6"
             ),
             Div(
-                Label("Key Differentiators", cls="label"),
-                Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2"),
-                Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2"),
-                Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2"),
-                Button("Add Differentiator", cls="btn btn-outline btn-sm mt-2"),
-                cls="mb-4"
-            ),
-            Div(
-                Label("Competitors", cls="label"),
+                H2("Key Differentiators", cls="text-xl font-semibold mb-2"),
                 Ul(
-                    Li("Amazon", cls="mb-2"),
-                    Li("Microsoft", cls="mb-2"),
+                    Li(Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2")),
+                    Li(Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2")),
+                    Li(Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2")),
+                    cls="list-none p-0"
+                ),
+                Button("+ Add Differentiator", cls="btn btn-outline btn-sm mt-2"),
+                cls="mb-6"
+            ),
+            Div(
+                H2("Competitors", cls="text-xl font-semibold mb-2"),
+                Ul(
+                    Li(Div("Amazon", Button("x", cls="btn btn-ghost btn-xs ml-2"), cls="flex items-center")),
+                    Li(Div("Microsoft", Button("x", cls="btn btn-ghost btn-xs ml-2"), cls="flex items-center")),
                     cls="list-disc list-inside mb-2"
                 ),
                 Div(
                     Input(type="text", placeholder="Add a competitor", cls="input input-bordered w-full mr-2"),
-                    Button("Add", cls="btn btn-outline btn-sm"),
-                    cls="flex"
+                    Button("Add", cls="btn btn-primary btn-sm"),
+                    cls="flex mt-2"
                 ),
-                cls="mb-4"
+                cls="mb-6"
             ),
             Div(
-                Label("Social Media Profiles", cls="label"),
+                H2("Social Media Profiles", cls="text-xl font-semibold mb-2"),
                 Input(type="text", placeholder="Twitter profile URL", cls="input input-bordered w-full mb-2"),
                 Input(type="text", placeholder="LinkedIn profile URL", cls="input input-bordered w-full mb-2"),
-                Button("Add Profile", cls="btn btn-outline btn-sm mt-2"),
-                cls="mb-4"
+                Button("+ Add Profile", cls="btn btn-outline btn-sm mt-2"),
+                cls="mb-6"
             ),
-            Button("Save Strategy", cls="btn btn-primary"),
-            cls="space-y-4"
+            cls="grid grid-cols-1 md:grid-cols-2 gap-6"
         ),
-        A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
+        Div(
+            Button("Save Strategy", cls="btn btn-primary text-white"),
+            A("View Prompts", href="/prompts", cls="btn btn-link ml-4"),
+            cls="mt-8"
+        ),
         cls="container mx-auto"
     )
     return Titled(title, create_layout(content))
 
 @app.get("/working-titles")
 def get():
-    title = "Working Titles"
+    title = WORKING_TITLES
+    
+    theme_mapping = {
+        "AI Marketing": "AI Mktg",
+        "Cybersecurity": "Cyber",
+        "AI": "AI",
+        "Regulations": "Regs",
+        "AI Ethics": "Ethics",
+        "Finance": "Finance"
+    }
+    theme_counts = Counter()
+    for title in working_titles:
+        for theme in title['theme'].split(', '):
+            short_theme = theme_mapping.get(theme, theme[:6])
+            theme_counts[short_theme] += 1
+    
+    # Using DaisyUI theme colors
+    badge_colors = ['badge-primary text-white', 'badge-secondary text-white', 'badge-accent text-white', 
+                    'badge-info text-white', 'badge-success text-white', 'badge-warning text-white']
+    
+    # Define status badge colors with different darkness levels of blue
+    status_badge_colors = {
+        "new": "bg-blue-200 text-blue-800",
+        "outlined": "bg-blue-300 text-blue-800",
+        "draft": "bg-blue-400 text-blue-800",
+        "final": "bg-blue-500 text-blue-800",
+        "published": "bg-blue-600 text-blue-800"
+    }
+    
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
+        H1("Working Titles", cls="text-4xl font-bold mb-8"),
+        create_progress_bar(WORKING_TITLES),
         Div(
-            Input(type="text", placeholder="Search titles", cls="input input-bordered w-full max-w-xs mr-2"),
-            Select(
-                Option("All Themes", value=""),
-                *(Option(theme) for theme in set(title['theme'] for title in working_titles)),
-                cls="select select-bordered"
+            Div(
+                Input(type="text", placeholder="Search for a working title", cls="input input-bordered w-full max-w-xs text-lg py-3 mr-4"),
+                cls="flex items-center"
             ),
-            cls="mb-4"
+            Div(
+                *(Div(
+                    Div(str(count), cls="absolute -top-2 -right-2 bg-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border border-base-300 shadow text-black"),
+                    short_theme,
+                    cls=f"badge {badge_colors[i % len(badge_colors)]} badge-md px-3 py-1 text-xs font-semibold mr-3 mb-3 cursor-pointer relative",
+                    onclick=f"filterTheme('{short_theme}')"
+                ) for i, (short_theme, count) in enumerate(theme_counts.items())),
+                cls="flex flex-wrap"
+            ),
+            cls="flex items-center justify-between mb-8"
         ),
         Table(
             Thead(
                 Tr(
-                    Th("Title"),
-                    Th("Subtitle"),
-                    Th("Theme"),
-                    Th("Status"),
-                    Th("Inspiration"),
-                    Th("Actions")
+                    Th("Title", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                    Th("Subtitle", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                    Th("Themes", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                    Th("Current Status", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                    Th("Inspiration Source", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                    Th("Actions", cls="text-left font-bold text-lg py-3 text-gray-600")
                 )
             ),
             Tbody(
                 *(Tr(
-                    Td(title['title']),
-                    Td(title['subtitle']),
-                    Td(title['theme']),
-                    Td(Div(title['status'].capitalize(), cls=f"badge badge-{title['status'].lower()}")),
-                    Td(title['inspiration']),
+                    Td(title['title'], cls="py-3 border-b border-base-300"),
+                    Td(title['subtitle'], cls="py-3 border-b border-base-300"),
+                    Td(Div(
+                        *(Div(
+                            theme_mapping.get(theme.strip(), theme.strip()[:6]),
+                            cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
+                        ) for theme in title['theme'].split(', ')),
+                        cls="flex flex-wrap"
+                    ), cls="py-3 border-b border-base-300"),
+                    Td(Div(title['status'].capitalize(), cls=f"badge {status_badge_colors[title['status'].lower()]} badge-sm text-sm"), cls="py-3 border-b border-base-300"),
+                    Td(title['inspiration'], cls="py-3 border-b border-base-300"),
                     Td(
                         Div(
-                            A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-xs btn-outline"),
-                            A("Select", href=f"/select-title/{title['id']}", cls="btn btn-xs btn-primary"),
-                            cls="btn-group"
-                        )
+                            A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-sm btn-outline mr-2"),
+                            A("Select", href=f"/select-title/{title['id']}", cls="btn btn-sm btn-primary text-white"),
+                            cls="flex"
+                        ),
+                        cls="py-3 border-b border-base-300"
                     )
                 ) for title in working_titles)
             ),
-            cls="table table-zebra w-full"
+            cls="table w-full mb-8"
         ),
         Div(
-            Input(type="text", placeholder="Enter a new working title", cls="input input-bordered w-full max-w-xs mr-2"),
-            Button("Add Title", cls="btn btn-primary"),
-            Button("Generate Titles", cls="btn btn-secondary ml-2"),
-            cls="mt-4"
+            Div(
+                Input(type="text", placeholder="Enter a new working title", cls="input input-bordered w-full max-w-md text-lg py-3"),
+                Button("+ Add Title", cls="btn btn-primary btn-md ml-3 text-white"),
+                cls="flex items-center"
+            ),
+            Button("Generate Titles", cls="btn btn-secondary btn-md ml-4 text-white"),
+            A("View Prompts", href="/prompts", cls="btn btn-link btn-md ml-4"),
+            cls="mt-8 flex items-center"
         ),
-        A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
-        cls="container mx-auto"
+        Script("""
+        function filterTheme(theme) {
+            console.log('Filtering by theme:', theme);
+        }
+        function changeTheme(theme) {
+            document.getElementById('theme-wrapper').setAttribute('data-theme', theme);
+        }
+        """),
+        cls="container mx-auto px-4"
     )
     return Titled(title, create_layout(content))
 
-@app.get("/outlining")
+@app.get("/outline")
 def get():
-    title = "Outlining"
+    title = OUTLINE
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
+        H1(title, cls="text-4xl font-bold mb-8"),
+        create_progress_bar(OUTLINE),
         Div(
             Select(
                 Option("Choose a working title", value=""),
@@ -218,8 +333,8 @@ def get():
         ),
         Textarea(placeholder="Enter or generate an outline here", cls="textarea textarea-bordered w-full h-64"),
         Div(
-            Button("Generate Outline", cls="btn btn-primary"),
-            Button("Edit Outline", cls="btn btn-secondary ml-2"),
+            Button("Generate Outline", cls="btn btn-primary text-white"),
+            Button("Edit Outline", cls="btn btn-secondary text-white ml-2"),
             cls="mt-4"
         ),
         A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
@@ -240,9 +355,10 @@ def get():
 
 @app.get("/full-text")
 def get():
-    title = "Full Text Generation"
+    title = FULL_TEXT
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
+        H1(title, cls="text-4xl font-bold mb-8"),
+        create_progress_bar(FULL_TEXT),
         Select(
             Option("Choose an outline", value=""),
             Option("AI-Powered Marketing Strategy Outline", value="1"),
@@ -251,8 +367,8 @@ def get():
         ),
         Textarea(placeholder="Generated full text will appear here", cls="textarea textarea-bordered w-full h-64"),
         Div(
-            Button("Generate Full Text", cls="btn btn-primary"),
-            Button("Edit Text", cls="btn btn-secondary ml-2"),
+            Button("Generate Full Text", cls="btn btn-primary text-white"),
+            Button("Edit Text", cls="btn btn-secondary text-white ml-2"),
             Button("View Diff", cls="btn btn-outline ml-2"),
             cls="mt-4"
         ),
@@ -272,11 +388,12 @@ def get():
     )
     return Titled(title, create_layout(content))
 
-@app.get("/content-reuse")
+@app.get("/reuse")
 def get():
-    title = "Content Reuse"
+    title = REUSE
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
+        H1(title, cls="text-4xl font-bold mb-8"),
+        create_progress_bar(REUSE),
         Select(
             Option("Choose a full-text article", value=""),
             Option("AI-Powered Marketing Strategy", value="1"),
@@ -285,8 +402,8 @@ def get():
         ),
         Textarea(placeholder="Generated shorter content will appear here", cls="textarea textarea-bordered w-full h-32"),
         Div(
-            Button("Generate Short Content", cls="btn btn-primary"),
-            Button("Edit Content", cls="btn btn-secondary ml-2"),
+            Button("Generate Short Content", cls="btn btn-primary text-white"),
+            Button("Edit Content", cls="btn btn-secondary text-white ml-2"),
             cls="mt-4"
         ),
         A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
@@ -307,14 +424,14 @@ def get():
 
 @app.get("/prompts")
 def get():
-    title = "Prompts"
+    title = PROMPTS
     content = Div(
-        H1(title, cls="text-3xl font-bold mb-4"),
+        H1(title, cls="text-4xl font-bold mb-8"),
         *(Div(
             H2(f"{stage} Prompts", cls="text-2xl font-bold mb-2"),
             Textarea(placeholder=f"Enter prompts for {stage}", cls="textarea textarea-bordered w-full h-32"),
             Div(
-                Button("Regenerate Prompt", cls="btn btn-primary"),
+                Button("Regenerate Prompt", cls="btn btn-primary text-white"),
                 Button("View Diff", cls="btn btn-outline ml-2"),
                 Select(
                     Option("Choose version", value=""),
@@ -325,8 +442,8 @@ def get():
                 cls="mt-2"
             ),
             cls="mb-8"
-        ) for stage in ["Company Strategy", "Working Titles", "Outlining", "Full Text Generation", "Content Reuse"]),
-        Button("Save All Prompts", cls="btn btn-primary mt-4"),
+        ) for stage in MAIN_STEPS),
+        Button("Save All Prompts", cls="btn btn-primary text-white mt-4"),
         cls="container mx-auto"
     )
     return Titled(title, create_layout(content))
