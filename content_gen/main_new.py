@@ -1,6 +1,15 @@
 from fasthtml.common import *
 from collections import defaultdict, Counter
-from fasthtml.common import Div  # Make sure Div is imported
+from fasthtml.common import Div, Textarea  # Make sure Textarea is imported
+from prompts import (
+    OUR_STRATEGY_PROMPT,
+    WORKING_TITLES_PROMPT,
+    OUTLINE_PROMPT,
+    FULL_TEXT_PROMPT,
+    REUSE_PROMPT,
+    TITLE_GENERATION_PROMPT,
+    CONTENT_EDITING_PROMPT,
+)
 
 # Global variables for screen names
 DASHBOARD = "Dashboard"
@@ -51,7 +60,9 @@ def create_layout(content):
             Option("Emerald", value="emerald"),
             Option("Synthwave", value="synthwave"),
             cls="select select-bordered w-full max-w-xs",
-            onchange="changeTheme(this.value)"
+            hx_post="/change-theme",
+            hx_target="#theme-wrapper",
+            hx_swap="attributes"
         ),
         cls="fixed bottom-4 right-4"
     )
@@ -294,11 +305,11 @@ def get():
                             cls="flex"
                         ),
                         cls="py-3 border-b border-base-300"
-                    )
+                    ),
+                    id=f"title-row-{title['id']}"
                 ) for title in working_titles),
-                id=f"title-row-{title['id']}"
+                cls="table w-full mb-8"
             ),
-            cls="table w-full mb-8"
         ),
         Div(
             Div(
@@ -311,14 +322,15 @@ def get():
             A("Next", href="/outline", cls="btn btn-secondary text-white"),
             cls="mt-8 flex justify-between items-center"
         ),
-        Script("""
-        function filterTheme(theme) {
-            console.log('Filtering by theme:', theme);
-        }
-        function changeTheme(theme) {
-            document.getElementById('theme-wrapper').setAttribute('data-theme', theme);
-        }
-        """),
+        Div(
+            id="theme-filter",
+            hx_get="/filter-theme",
+            hx_trigger="click",
+            hx_target="#working-titles-table",
+            hx_include="[name='theme']"
+        ),
+        Input(type="hidden", name="theme", id="selected-theme"),
+        
         cls="container mx-auto px-4"
     )
     return Titled(title, create_layout(content))
@@ -495,25 +507,30 @@ def get():
     title = PROMPTS
     content = Div(
         H1(title, cls="text-4xl font-bold mb-8"),
-        *(Div(
-            H2(f"{stage} Prompts", cls="text-2xl font-bold mb-2"),
-            Textarea(placeholder=f"Enter prompts for {stage}", cls="textarea textarea-bordered w-full h-32"),
-            Div(
-                Button("Regenerate Prompt", cls="btn btn-primary text-white"),
-                Button("View Diff", cls="btn btn-outline ml-2"),
-                Select(
-                    Option("Choose version", value=""),
-                    Option("Version 1", value="1"),
-                    Option("Version 2", value="2"),
-                    cls="select select-bordered ml-2"
-                ),
-                cls="mt-2"
-            ),
-            cls="mb-8"
-        ) for stage in MAIN_STEPS),
-        Button("Save All Prompts", cls="btn btn-primary text-white mt-4"),
+        Div(
+            H2("Our Strategy Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(OUR_STRATEGY_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            H2("Working Titles Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(WORKING_TITLES_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            H2("Outline Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(OUTLINE_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            H2("Full Text Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(FULL_TEXT_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            H2("Reuse Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(REUSE_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            H2("Title Generation Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(TITLE_GENERATION_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            H2("Content Editing Prompt", cls="text-xl font-semibold mb-2"),
+            Textarea(CONTENT_EDITING_PROMPT, cls="textarea textarea-bordered w-full h-24 mb-4"),
+            cls="space-y-4"
+        ),
         cls="container mx-auto"
     )
     return Titled(title, create_layout(content))
+
+@app.post("/change-theme")
+def change_theme():
+    theme = request.form.get("theme")
+    return {"data-theme": theme}
 
 serve()
