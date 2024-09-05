@@ -18,11 +18,6 @@ MAIN_STEPS = [OUR_STRATEGY, WORKING_TITLES, OUTLINE, FULL_TEXT, REUSE]
 hdrs = (
     Script(src="https://cdn.tailwindcss.com"),
     Link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css"),
-    Script("""
-    function changeTheme(theme) {
-        document.getElementById('theme-wrapper').setAttribute('data-theme', theme);
-    }
-    """)
 )
 app = FastHTML(hdrs=hdrs, ws_hdr=True)
 
@@ -158,7 +153,11 @@ def get():
 def get():
     title = OUR_STRATEGY
     content = Div(
-        H1(title, cls="text-4xl font-bold mb-8"),
+        Div(
+            H1(title, cls="text-4xl font-bold"),
+            A("Next", href="/working-titles", cls="btn btn-secondary text-white", id="nextButton", hx_get="/activate-next", hx_trigger="titleSelected from:body", hx_swap="outerHTML"),
+            cls="flex justify-between items-center mb-8"
+        ),
         create_progress_bar(OUR_STRATEGY),
         Div(
             Div(
@@ -203,7 +202,8 @@ def get():
         Div(
             Button("Save Strategy", cls="btn btn-primary text-white"),
             A("View Prompts", href="/prompts", cls="btn btn-link ml-4"),
-            cls="mt-8"
+            A("Next", href="/working-titles", cls="btn btn-secondary text-white"),
+            cls="mt-8 flex justify-between items-center"
         ),
         cls="container mx-auto"
     )
@@ -241,7 +241,11 @@ def get():
     }
     
     content = Div(
-        H1("Working Titles", cls="text-4xl font-bold mb-8"),
+        Div(
+            H1("Working Titles", cls="text-4xl font-bold"),
+            A("Next", href="/outline", cls="btn btn-secondary text-white opacity-50", id="nextButton", hx_get="/activate-next", hx_trigger="titleSelected from:body", hx_swap="outerHTML"),
+            cls="flex justify-between items-center mb-8"
+        ),
         create_progress_bar(WORKING_TITLES),
         Div(
             Div(
@@ -286,12 +290,13 @@ def get():
                     Td(
                         Div(
                             A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-sm btn-outline mr-2"),
-                            A("Select", href=f"/select-title/{title['id']}", cls="btn btn-sm btn-primary text-white"),
+                            Button("Select", cls="btn btn-sm btn-primary text-white", hx_post=f"/select-title/{title['id']}", hx_target="closest tr", hx_swap="outerHTML"),
                             cls="flex"
                         ),
                         cls="py-3 border-b border-base-300"
                     )
-                ) for title in working_titles)
+                ) for title in working_titles),
+                id=f"title-row-{title['id']}"
             ),
             cls="table w-full mb-8"
         ),
@@ -303,7 +308,8 @@ def get():
             ),
             Button("Generate Titles", cls="btn btn-secondary btn-md ml-4 text-white"),
             A("View Prompts", href="/prompts", cls="btn btn-link btn-md ml-4"),
-            cls="mt-8 flex items-center"
+            A("Next", href="/outline", cls="btn btn-secondary text-white"),
+            cls="mt-8 flex justify-between items-center"
         ),
         Script("""
         function filterTheme(theme) {
@@ -317,11 +323,52 @@ def get():
     )
     return Titled(title, create_layout(content))
 
+@app.post("/select-title/{title_id}")
+def select_title(title_id: int):
+    # Find the selected title
+    selected_title = next((t for t in working_titles if t['id'] == title_id), None)
+    if not selected_title:
+        return "Title not found", 404
+
+    # Create the updated row with a different background color
+    return Tr(
+        Td(selected_title['title'], cls="py-3 border-b border-base-300"),
+        Td(selected_title['subtitle'], cls="py-3 border-b border-base-300"),
+        Td(Div(
+            *(Div(
+                theme_mapping.get(theme.strip(), theme.strip()[:6]),
+                cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
+            ) for theme in selected_title['theme'].split(', ')),
+            cls="flex flex-wrap"
+        ), cls="py-3 border-b border-base-300"),
+        Td(Div(selected_title['status'].capitalize(), cls=f"badge {status_badge_colors[selected_title['status'].lower()]} badge-sm text-sm"), cls="py-3 border-b border-base-300"),
+        Td(selected_title['inspiration'], cls="py-3 border-b border-base-300"),
+        Td(
+            Div(
+                A("Edit", href=f"/edit-title/{selected_title['id']}", cls="btn btn-sm btn-outline mr-2"),
+                Button("Selected", cls="btn btn-sm btn-success text-white"),
+                cls="flex"
+            ),
+            cls="py-3 border-b border-base-300"
+        ),
+        id=f"title-row-{selected_title['id']}",
+        cls="bg-base-200",  # Use DaisyUI theme color for selected row
+        hx_trigger="load"
+    )
+
+@app.get("/activate-next")
+def activate_next():
+    return A("Next", href="/outline", cls="btn btn-secondary text-white", id="nextButton", hx_get="/activate-next", hx_trigger="titleSelected from:body", hx_swap="outerHTML")
+
 @app.get("/outline")
 def get():
     title = OUTLINE
     content = Div(
-        H1(title, cls="text-4xl font-bold mb-8"),
+        Div(
+            H1(title, cls="text-4xl font-bold"),
+            A("Next", href="/full-text", cls="btn btn-secondary text-white", id="nextButton", hx_get="/activate-next", hx_trigger="titleSelected from:body", hx_swap="outerHTML"),
+            cls="flex justify-between items-center mb-8"
+        ),
         create_progress_bar(OUTLINE),
         Div(
             Select(
@@ -349,6 +396,11 @@ def get():
             ),
             cls="mt-8 p-4 bg-base-200 rounded-box"
         ),
+        Div(
+            A("View Prompts", href="/prompts", cls="btn btn-link"),
+            A("Next", href="/full-text", cls="btn btn-secondary text-white"),
+            cls="mt-8 flex justify-between items-center"
+        ),
         cls="container mx-auto"
     )
     return Titled(title, create_layout(content))
@@ -357,7 +409,11 @@ def get():
 def get():
     title = FULL_TEXT
     content = Div(
-        H1(title, cls="text-4xl font-bold mb-8"),
+        Div(
+            H1(title, cls="text-4xl font-bold"),
+            A("Next", href="/reuse", cls="btn btn-secondary text-white", id="nextButton", hx_get="/activate-next", hx_trigger="titleSelected from:body", hx_swap="outerHTML"),
+            cls="flex justify-between items-center mb-8"
+        ),
         create_progress_bar(FULL_TEXT),
         Select(
             Option("Choose an outline", value=""),
@@ -372,7 +428,11 @@ def get():
             Button("View Diff", cls="btn btn-outline ml-2"),
             cls="mt-4"
         ),
-        A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
+        Div(
+            A("View Prompts", href="/prompts", cls="btn btn-link"),
+            A("Next", href="/reuse", cls="btn btn-secondary text-white"),
+            cls="mt-8 flex justify-between items-center"
+        ),
         Div(
             H3("Chat with AI", cls="text-xl font-bold mb-2"),
             Div("How can I assist you with the full text generation?", cls="chat-bubble", cls_="chat chat-start"),
@@ -392,7 +452,11 @@ def get():
 def get():
     title = REUSE
     content = Div(
-        H1(title, cls="text-4xl font-bold mb-8"),
+        Div(
+            H1(title, cls="text-4xl font-bold"),
+            Button("Publish", cls="btn btn-success text-white", id="nextButton", hx_get="/activate-next", hx_trigger="titleSelected from:body", hx_swap="outerHTML"),
+            cls="flex justify-between items-center mb-8"
+        ),
         create_progress_bar(REUSE),
         Select(
             Option("Choose a full-text article", value=""),
@@ -406,7 +470,11 @@ def get():
             Button("Edit Content", cls="btn btn-secondary text-white ml-2"),
             cls="mt-4"
         ),
-        A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
+        Div(
+            A("View Prompts", href="/prompts", cls="btn btn-link"),
+            Button("Publish", cls="btn btn-success text-white"),
+            cls="mt-8 flex justify-between items-center"
+        ),
         Div(
             H3("Chat with AI", cls="text-xl font-bold mb-2"),
             Div("How would you like to repurpose this content?", cls="chat-bubble", cls_="chat chat-start"),
