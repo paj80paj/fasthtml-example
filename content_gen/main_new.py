@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from collections import defaultdict
+from fasthtml.common import Div  # Make sure Div is imported
 
 # Set up the app
 hdrs = (
@@ -28,7 +29,7 @@ def create_layout(content):
         A("Prompts", href="/prompts", cls="btn btn-ghost btn-block"),
         cls="menu bg-base-200 w-56 p-4"
     )
-    return Div(sidebar, Div(content, cls="flex-1 p-8"), cls="flex min-h-screen bg-base-100")
+    return Div(sidebar, Div(content, cls="flex-1 p-8"), cls="flex min-h-screen bg-base-100", data_theme="corporate")
 
 @app.get("/")
 def get():
@@ -116,6 +117,7 @@ def get():
                 Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2"),
                 Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2"),
                 Input(type="text", placeholder="Enter a key differentiator", cls="input input-bordered w-full mb-2"),
+                Button("Add Differentiator", cls="btn btn-outline btn-sm mt-2"),
                 cls="mb-4"
             ),
             Div(
@@ -125,18 +127,24 @@ def get():
                     Li("Microsoft", cls="mb-2"),
                     cls="list-disc list-inside mb-2"
                 ),
-                Input(type="text", placeholder="Add a competitor", cls="input input-bordered w-full"),
+                Div(
+                    Input(type="text", placeholder="Add a competitor", cls="input input-bordered w-full mr-2"),
+                    Button("Add", cls="btn btn-outline btn-sm"),
+                    cls="flex"
+                ),
                 cls="mb-4"
             ),
             Div(
                 Label("Social Media Profiles", cls="label"),
                 Input(type="text", placeholder="Twitter profile URL", cls="input input-bordered w-full mb-2"),
                 Input(type="text", placeholder="LinkedIn profile URL", cls="input input-bordered w-full mb-2"),
+                Button("Add Profile", cls="btn btn-outline btn-sm mt-2"),
                 cls="mb-4"
             ),
             Button("Save Strategy", cls="btn btn-primary"),
             cls="space-y-4"
         ),
+        A("View Prompts", href="/prompts", cls="btn btn-link mt-4"),
         cls="container mx-auto"
     )
     return Titled(title, create_layout(content))
@@ -171,7 +179,7 @@ def get():
                     Td(title['title']),
                     Td(title['subtitle']),
                     Td(title['theme']),
-                    Td(Badge(title['status'].capitalize(), cls=f"badge badge-{title['status'].lower()}")),
+                    Td(Div(title['status'].capitalize(), cls=f"badge badge-{title['status'].lower()}")),
                     Td(title['inspiration']),
                     Td(
                         Div(
@@ -219,7 +227,11 @@ def get():
             H3("Chat with AI", cls="text-xl font-bold mb-2"),
             Div("How can I help you with your outline?", cls="chat-bubble", cls_="chat chat-start"),
             Div("Can you suggest a structure for my AI marketing strategy article?", cls="chat-bubble", cls_="chat chat-end"),
-            Input(type="text", placeholder="Type your message here", cls="input input-bordered w-full mt-2"),
+            Div(
+                Input(type="text", placeholder="Type your message here", cls="input input-bordered w-full"),
+                Button("Send", cls="btn btn-primary ml-2"),
+                cls="flex mt-2"
+            ),
             cls="mt-8 p-4 bg-base-200 rounded-box"
         ),
         cls="container mx-auto"
@@ -249,7 +261,11 @@ def get():
             H3("Chat with AI", cls="text-xl font-bold mb-2"),
             Div("How can I assist you with the full text generation?", cls="chat-bubble", cls_="chat chat-start"),
             Div("Can you expand on the second point in the outline?", cls="chat-bubble", cls_="chat chat-end"),
-            Input(type="text", placeholder="Type your message here", cls="input input-bordered w-full mt-2"),
+            Div(
+                Input(type="text", placeholder="Type your message here", cls="input input-bordered w-full"),
+                Button("Send", cls="btn btn-primary ml-2"),
+                cls="flex mt-2"
+            ),
             cls="mt-8 p-4 bg-base-200 rounded-box"
         ),
         cls="container mx-auto"
@@ -278,7 +294,11 @@ def get():
             H3("Chat with AI", cls="text-xl font-bold mb-2"),
             Div("How would you like to repurpose this content?", cls="chat-bubble", cls_="chat chat-start"),
             Div("Can you create a tweet thread from the main points?", cls="chat-bubble", cls_="chat chat-end"),
-            Input(type="text", placeholder="Type your message here", cls="input input-bordered w-full mt-2"),
+            Div(
+                Input(type="text", placeholder="Type your message here", cls="input input-bordered w-full"),
+                Button("Send", cls="btn btn-primary ml-2"),
+                cls="flex mt-2"
+            ),
             cls="mt-8 p-4 bg-base-200 rounded-box"
         ),
         cls="container mx-auto"
@@ -296,6 +316,12 @@ def get():
             Div(
                 Button("Regenerate Prompt", cls="btn btn-primary"),
                 Button("View Diff", cls="btn btn-outline ml-2"),
+                Select(
+                    Option("Choose version", value=""),
+                    Option("Version 1", value="1"),
+                    Option("Version 2", value="2"),
+                    cls="select select-bordered ml-2"
+                ),
                 cls="mt-2"
             ),
             cls="mb-8"
