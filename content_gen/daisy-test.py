@@ -10,8 +10,8 @@ app, rt = fast_app(hdrs=hdrs, live=True)
 @rt("/")
 def get():
     content = Div(
-        # Card component
-        P("Card: A self-contained piece of information"),
+        # ===== Card component =====
+        P("Card: A self-contained piece of information", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 H2("Card title", cls="card-title"),
@@ -26,8 +26,10 @@ def get():
             cls="card w-96 bg-base-100 shadow-xl mb-4"
         ),
         
-        # Alert component
-        P("Alert: Displays important messages or notifications"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Alert component =====
+        P("Alert: Displays important messages or notifications", cls="text-xl font-bold text-black"),
         Div(
             Svg(viewBox="0 0 24 24", cls="stroke-info shrink-0 w-6 h-6", contents=[
                 Path(stroke_linecap="round", stroke_linejoin="round", stroke_width="2", d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z")
@@ -36,8 +38,10 @@ def get():
             cls="alert alert-info mb-4"
         ),
         
-        # Tabs component
-        P("Tabs: Organize content into different sections"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Tabs component =====
+        P("Tabs: Organize content into different sections", cls="text-xl font-bold text-black"),
         Div(
             cls="tabs tabs-lifted mb-4",
             role="tablist",
@@ -54,8 +58,10 @@ def get():
             ]
         ),
         
-        # Dropdown menu
-        P("Dropdown: Compact navigation or selection options"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Dropdown menu =====
+        P("Dropdown: Compact navigation or selection options", cls="text-xl font-bold text-black"),
         Div(
             Label("Select", tabindex="0", cls="btn m-1"),
             Ul(
@@ -67,8 +73,10 @@ def get():
             cls="dropdown mb-4"
         ),
         
-        # Modal dialog
-        P("Modal Dialog: Click to open a popup that requires user interaction"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Modal dialog =====
+        P("Modal Dialog: Click to open a popup that requires user interaction", cls="text-xl font-bold text-black"),
         Div(
             Button("open modal", cls="btn", onclick="my_modal.showModal()"),
             Dialog(
@@ -90,12 +98,16 @@ def get():
             cls="mb-4"
         ),
         
-        # Toggle component
-        P("Toggle: Switch between two states (on/off)"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Toggle component =====
+        P("Toggle: Switch between two states (on/off)", cls="text-xl font-bold text-black"),
         Input(type="checkbox", cls="toggle", checked=True),
         
-        # Rating component
-        P("Rating: Select a star rating (1-5 stars)"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Rating component =====
+        P("Rating: Select a star rating (1-5 stars)", cls="text-xl font-bold text-black"),
         Div(
             Input(type="radio", name="rating-1", cls="mask mask-star"),
             Input(type="radio", name="rating-1", cls="mask mask-star", checked=True),
@@ -105,12 +117,16 @@ def get():
             cls="rating mb-4"
         ),
         
-        # Progress bar
-        P("Progress Bar: Visual indicator of task completion (70% complete)"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Progress bar =====
+        P("Progress Bar: Visual indicator of task completion (70% complete)", cls="text-xl font-bold text-black"),
         Progress(cls="progress progress-primary w-56", value="70", max="100"),
         
-        # Carousel
-        P("Carousel: Slideshow for cycling through images or content"),
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== Carousel =====
+        P("Carousel: Slideshow for cycling through images or content", cls="text-xl font-bold text-black"),
         Div(
             Div(id="slide1", cls="carousel-item relative w-full", contents=[
                 Img(src="https://daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.jpg", cls="w-full"),
@@ -123,10 +139,12 @@ def get():
             cls="carousel w-full"
         ),
         
-        # New components from DaisyUI
+        Hr(cls="my-8"),  # Dividing line
+        
+        # ===== New components from DaisyUI =====
 
-        # Accordion component
-        P("Accordion: Collapsible content panels"),
+        # ===== Accordion component =====
+        P("Accordion: Collapsible content panels", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 Input(type="radio", name="my-accordion-1", checked=True),
@@ -137,8 +155,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Avatar component
-        P("Avatar: Display user profile images"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Avatar component =====
+        P("Avatar: Display user profile images", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 Img(src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"),
@@ -147,8 +167,10 @@ def get():
             cls="avatar mb-4"
         ),
 
-        # Badge component
-        P("Badge: Small status descriptors"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Badge component =====
+        P("Badge: Small status descriptors", cls="text-xl font-bold text-black"),
         Div(
             Div("Badge", cls="badge"),
             Div("Badge", cls="badge badge-neutral"),
@@ -156,8 +178,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Bottom navigation component
-        P("Bottom navigation: Mobile-friendly navigation bar"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Bottom navigation component =====
+        P("Bottom navigation: Mobile-friendly navigation bar", cls="text-xl font-bold text-black"),
         Div(
             A("Home", cls="active"),
             A("Search"),
@@ -165,8 +189,10 @@ def get():
             cls="btm-nav mb-4"
         ),
 
-        # Breadcrumbs component
-        P("Breadcrumbs: Show navigation hierarchy"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Breadcrumbs component =====
+        P("Breadcrumbs: Show navigation hierarchy", cls="text-xl font-bold text-black"),
         Div(
             Ul(
                 Li(A("Home")),
@@ -177,8 +203,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Button group component
-        P("Button group: Group related actions"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Button group component =====
+        P("Button group: Group related actions", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 Input(type="radio", name="options", data_title="Left", cls="btn"),
@@ -189,8 +217,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Chat bubble component
-        P("Chat bubble: Display conversation messages"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Chat bubble component =====
+        P("Chat bubble: Display conversation messages", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 Div("How are you?", cls="chat-bubble"),
@@ -203,8 +233,10 @@ def get():
             cls="chat chat-start mb-4"
         ),
 
-        # Collapse component
-        P("Collapse: Toggle visibility of content"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Collapse component =====
+        P("Collapse: Toggle visibility of content", cls="text-xl font-bold text-black"),
         Div(
             Input(type="checkbox"),
             Div("Click me to show/hide content", cls="collapse-title text-xl font-medium"),
@@ -212,8 +244,10 @@ def get():
             cls="collapse bg-base-200 mb-4"
         ),
 
-        # Divider component
-        P("Divider: Separate content sections"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Divider component =====
+        P("Divider: Separate content sections", cls="text-xl font-bold text-black"),
         Div(
             "Above content",
             Div("OR", cls="divider"),
@@ -221,8 +255,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Footer component
-        P("Footer: Page footer with multiple columns"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Footer component =====
+        P("Footer: Page footer with multiple columns", cls="text-xl font-bold text-black"),
         Footer(
             Div(
                 Div(
@@ -241,8 +277,10 @@ def get():
             cls="footer p-10 bg-neutral text-neutral-content mb-4"
         ),
 
-        # Indicator component
-        P("Indicator: Show a badge on another element"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Indicator component =====
+        P("Indicator: Show a badge on another element", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 Span("99+", cls="indicator-item badge badge-secondary"),
@@ -251,8 +289,10 @@ def get():
             cls="indicator mb-4"
         ),
 
-        # Kbd (Keyboard) component
-        P("Kbd: Display keyboard key or shortcut"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Kbd (Keyboard) component =====
+        P("Kbd: Display keyboard key or shortcut", cls="text-xl font-bold text-black"),
         Div(
             Kbd("ctrl"),
             "+",
@@ -262,8 +302,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Link component
-        P("Link: Styled anchor tag"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Link component =====
+        P("Link: Styled anchor tag", cls="text-xl font-bold text-black"),
         Div(
             A("Simple link", cls="link"),
             A("Colored link", cls="link link-primary"),
@@ -271,15 +313,19 @@ def get():
             cls="mb-4"
         ),
 
-        # Loading component
-        P("Loading: Indicate content is being loaded"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Loading component =====
+        P("Loading: Indicate content is being loaded", cls="text-xl font-bold text-black"),
         Div(
             Span("Loading...", cls="loading loading-dots loading-lg"),
             cls="mb-4"
         ),
 
-        # Menu component
-        P("Menu: Vertical menu for navigation"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Menu component =====
+        P("Menu: Vertical menu for navigation", cls="text-xl font-bold text-black"),
         Ul(
             Li(A("Item 1")),
             Li(A("Item 2")),
@@ -287,8 +333,10 @@ def get():
             cls="menu bg-base-200 w-56 rounded-box mb-4"
         ),
 
-        # Navbar component
-        P("Navbar: Responsive navigation header"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Navbar component =====
+        P("Navbar: Responsive navigation header", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 A("daisyUI", cls="btn btn-ghost normal-case text-xl"),
@@ -306,8 +354,10 @@ def get():
             cls="navbar bg-base-100 mb-4"
         ),
 
-        # Pagination component
-        P("Pagination: Navigate through pages"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Pagination component =====
+        P("Pagination: Navigate through pages", cls="text-xl font-bold text-black"),
         Div(
             Button("«", cls="join-item btn btn-outline"),
             Button("Page 22", cls="join-item btn btn-outline"),
@@ -315,15 +365,19 @@ def get():
             cls="join mb-4"
         ),
 
-        # Radial progress component
-        P("Radial progress: Circular progress indicator"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Radial progress component =====
+        P("Radial progress: Circular progress indicator", cls="text-xl font-bold text-black"),
         Div(
             Div("70%", cls="radial-progress", style="--value:70;"),
             cls="mb-4"
         ),
 
-        # Select component
-        P("Select: Dropdown for selecting options"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Select component =====
+        P("Select: Dropdown for selecting options", cls="text-xl font-bold text-black"),
         Div(
             Select(
                 Option("Pick your favorite Simpson"),
@@ -337,8 +391,10 @@ def get():
             cls="mb-4"
         ),
 
-        # Stat component
-        P("Stat: Display statistics"),
+        Hr(cls="my-8"),  # Dividing line
+
+        # ===== Stat component =====
+        P("Stat: Display statistics", cls="text-xl font-bold text-black"),
         Div(
             Div(
                 Div(
@@ -351,8 +407,8 @@ def get():
             cls="stats shadow mb-4"
         ),
 
-        # Steps component
-        P("Steps: Show progress through a series of steps"),
+        # ===== Steps component =====
+        P("Steps: Show progress through a series of steps", cls="text-xl font-bold text-black"),
         Ul(
             Li("Step 1", cls="step step-primary"),
             Li("Step 2", cls="step step-primary"),
@@ -361,8 +417,8 @@ def get():
             cls="steps mb-4"
         ),
 
-        # Timeline component
-        P("Timeline: Display a series of events"),
+        # ===== Timeline component =====
+        P("Timeline: Display a series of events", cls="text-xl font-bold text-black"),
         Ul(
             Li(
                 Div(
@@ -386,11 +442,11 @@ def get():
         cls="p-4 space-y-4"
     )
 
-    # Explanation for one component (Accordion)
+    # ===== Explanation for one component (Accordion) =====
     explanation = Div(
-        H2("Accordion Component Explanation", cls="text-xl font-bold mb-2"),
-        P("The Accordion component is used to create collapsible content panels. It's particularly useful when you want to present a large amount of information in a compact space, allowing users to expand only the sections they're interested in."),
-        P("Use cases for the Accordion component include:"),
+        H2("Accordion Component Explanation", cls="text-2xl font-bold mb-2"),
+        P("The Accordion component is used to create collapsible content panels. It's particularly useful when you want to present a large amount of information in a compact space, allowing users to expand only the sections they're interested in.", cls="text-lg"),
+        P("Use cases for the Accordion component include:", cls="text-lg"),
         Ul(
             Li("FAQ sections where questions can be expanded to reveal answers"),
             Li("Product details pages where different aspects of the product can be collapsed"),
