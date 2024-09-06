@@ -76,14 +76,66 @@ def create_progress_bar(current_step):
     progress_value = (steps.index(current_step) + 1) * 20  # Each step is worth 20%
     
     return Div(
-        Ul(
-            *(Li(
-                cls=f"step {'step-primary' if steps.index(step) <= steps.index(current_step) else ''}"
-            ) for step in steps),
-            cls="steps w-full"
-        ),
+        # Ul(
+        #     *(Li(
+        #         cls=f"step {'step-primary' if steps.index(step) <= steps.index(current_step) else ''}"
+        #     ) for step in steps),
+        #     cls="steps w-full"
+        # ),
         Progress(cls="progress progress-primary w-full", value=str(progress_value), max="100"),
         cls="mb-8"
+    )
+
+def create_working_titles_table(working_titles, theme_mapping, badge_colors, status_badge_colors):
+    return Div(
+        cls="overflow-x-auto",  # Enable horizontal scrolling if table is too wide
+        contents=[
+            Table(
+                cls="table w-full",  # DaisyUI table class
+                contents=[
+                    # Table Header
+                    Thead(
+                        Tr(
+                            Th("#"),  # Header for the index column
+                            Th("Title"),
+                            Th("Subtitle"),
+                            Th("Themes"),
+                            Th("Current Status"),
+                            Th("Inspiration Source"),
+                            Th("Actions")
+                        )
+                    ),
+                    # Table Body
+                    Tbody(
+                        *(Tr(
+                            Td(str(i + 1)),  # Index column
+                            Td(title['title']),  # Title column
+                            Td(title['subtitle']),  # Subtitle column
+                            # Themes column with badges
+                            Td(Div(
+                                *(Div(
+                                    theme_mapping.get(theme.strip(), theme.strip()[:6]),
+                                    cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
+                                ) for theme in title['theme'].split(', ')),
+                                cls="flex flex-wrap"
+                            )),
+                            # Status column with colored badge
+                            Td(Div(title['status'].capitalize(), cls=f"badge {status_badge_colors[title['status'].lower()]} badge-sm text-sm")),
+                            Td(title['inspiration']),  # Inspiration source column
+                            # Actions column with Edit and Select buttons
+                            Td(
+                                Div(
+                                    A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-xs btn-outline mr-2"),
+                                    Button("Select", cls="btn btn-xs btn-primary text-white", hx_post=f"/select-title/{title['id']}", hx_target="#selection-message", hx_swap="innerHTML"),
+                                    cls="flex",
+                                    id=f"title-actions-{title['id']}"
+                                )
+                            )
+                        ) for i, title in enumerate(working_titles))
+                    )
+                ]
+            )
+        ]
     )
 
 @app.get("/")
@@ -220,6 +272,7 @@ def get():
 def get():
     title = WORKING_TITLES
     
+    # Define a mapping for theme abbreviations
     theme_mapping = {
         "AI Marketing": "AI Mktg",
         "Cybersecurity": "Cyber",
@@ -228,17 +281,19 @@ def get():
         "AI Ethics": "Ethics",
         "Finance": "Finance"
     }
+    
+    # Count the occurrences of each theme
     theme_counts = Counter()
     for title in working_titles:
         for theme in title['theme'].split(', '):
             short_theme = theme_mapping.get(theme, theme[:6])
             theme_counts[short_theme] += 1
     
-    # Using DaisyUI theme colors
+    # Define badge colors for themes using DaisyUI classes
     badge_colors = ['badge-primary text-white', 'badge-secondary text-white', 'badge-accent text-white', 
                     'badge-info text-white', 'badge-success text-white', 'badge-warning text-white']
     
-    # Define status badge colors with different darkness levels of blue
+    # Define status badge colors with different shades of blue
     status_badge_colors = {
         "new": "bg-blue-200 text-blue-800",
         "outlined": "bg-blue-300 text-blue-800",
@@ -255,10 +310,13 @@ def get():
         ),
         create_progress_bar(WORKING_TITLES),
         Div(
+            # Search input for working titles
             Div(
                 Input(type="text", placeholder="Search for a working title", cls="input input-bordered w-full max-w-xs text-lg py-3 mr-4"),
                 cls="flex items-center"
             ),
+            # Debug: Print size of search input HTML
+            print(f"Size of search input HTML: {len(str(Div(Input(type='text', placeholder='Search for a working title', cls='input input-bordered w-full max-w-xs text-lg py-3 mr-4'), cls='flex items-center')))} bytes"),
             Div(
                 *(Div(
                     Div(str(count), cls="absolute -top-2 -right-2 bg-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border border-base-300 shadow text-black"),
@@ -281,53 +339,8 @@ def get():
             A("Next", href="/outline", cls="btn btn-secondary text-white"),
             cls="mt-8 flex justify-between items-center"
         ),
-        Div(
-            Div(
-                cls="overflow-x-auto",
-                contents=[
-                    Table(
-                        Thead(
-                            Tr(
-                                Th(),
-                                Th("Title", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                                Th("Subtitle", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                                Th("Themes", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                                Th("Current Status", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                                Th("Inspiration Source", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                                Th("Actions", cls="text-left font-bold text-lg py-3 text-gray-600")
-                            )
-                        ),
-                        Tbody(
-                            *(Tr(
-                                Th(str(i + 1), cls="py-3 border-b border-base-300"),
-                                Td(title['title'], cls="py-3 border-b border-base-300"),
-                                Td(title['subtitle'], cls="py-3 border-b border-base-300"),
-                                Td(Div(
-                                    *(Div(
-                                        theme_mapping.get(theme.strip(), theme.strip()[:6]),
-                                        cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
-                                    ) for theme in title['theme'].split(', ')),
-                                    cls="flex flex-wrap"
-                                ), cls="py-3 border-b border-base-300"),
-                                Td(Div(title['status'].capitalize(), cls=f"badge {status_badge_colors[title['status'].lower()]} badge-sm text-sm"), cls="py-3 border-b border-base-300"),
-                                Td(title['inspiration'], cls="py-3 border-b border-base-300"),
-                                Td(
-                                    Div(
-                                        A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-xs btn-outline mr-2"),
-                                        Button("Select", cls="btn btn-xs btn-primary text-white", hx_post=f"/select-title/{title['id']}", hx_target="closest tr", hx_swap="outerHTML"),
-                                        cls="flex"
-                                    ),
-                                    cls="py-3 border-b border-base-300"
-                                )
-                            ) for i, title in enumerate(working_titles)),
-                            id=f"title-row-{title['id']}"
-                        ),
-                        cls="table w-full mb-8"
-                    )
-                ]
-            ),
-            cls="mb-8"
-        ),
+        create_working_titles_table(working_titles, theme_mapping, badge_colors, status_badge_colors),
+        Div(id="selection-message", cls="mt-4 text-center font-bold"),
         Script("""
         function filterTheme(theme) {
             console.log('Filtering by theme:', theme);
@@ -342,36 +355,13 @@ def get():
 
 @app.post("/select-title/{title_id}")
 def select_title(title_id: int):
-    # Find the selected title
+    # Find the selected title from the working_titles list
     selected_title = next((t for t in working_titles if t['id'] == title_id), None)
     if not selected_title:
         return "Title not found", 404
 
-    # Create the updated row with a different background color
-    return Tr(
-        Th(str(working_titles.index(selected_title) + 1), cls="py-3 border-b border-base-300"),
-        Td(selected_title['title'], cls="py-3 border-b border-base-300"),
-        Td(selected_title['subtitle'], cls="py-3 border-b border-base-300"),
-        Td(Div(
-            *(Div(
-                theme_mapping.get(theme.strip(), theme.strip()[:6]),
-                cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
-            ) for theme in selected_title['theme'].split(', ')),
-            cls="flex flex-wrap"
-        ), cls="py-3 border-b border-base-300"),
-        Td(Div(selected_title['status'].capitalize(), cls=f"badge {status_badge_colors[selected_title['status'].lower()]} badge-sm text-sm"), cls="py-3 border-b border-base-300"),
-        Td(selected_title['inspiration'], cls="py-3 border-b border-base-300"),
-        Td(
-            Div(
-                A("Edit", href=f"/edit-title/{selected_title['id']}", cls="btn btn-xs btn-outline mr-2"),
-                Button("Selected", cls="btn btn-xs btn-success text-white"),
-                cls="flex"
-            ),
-            cls="py-3 border-b border-base-300"
-        ),
-        cls="bg-base-200",  # Use DaisyUI theme color for selected row
-        hx_trigger="load"
-    )
+    # Instead, we'll just return a success message
+    return f"Title '{selected_title['title']}' selected successfully"
 
 @app.get("/activate-next")
 def activate_next():
