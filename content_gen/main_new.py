@@ -1,6 +1,13 @@
 from fasthtml.common import *
 from collections import defaultdict, Counter
 from fasthtml.common import Div  # Make sure Div is imported
+from prompts import (
+    OUR_STRATEGY_PROMPT,
+    WORKING_TITLES_PROMPT,
+    OUTLINE_PROMPT,
+    FULL_TEXT_PROMPT,
+    REUSE_PROMPT
+)
 
 # Global variables for screen names
 DASHBOARD = "Dashboard"
@@ -263,43 +270,6 @@ def get():
             ),
             cls="flex items-center justify-between mb-8"
         ),
-        Table(
-            Thead(
-                Tr(
-                    Th("Title", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                    Th("Subtitle", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                    Th("Themes", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                    Th("Current Status", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                    Th("Inspiration Source", cls="text-left font-bold text-lg py-3 text-gray-600"),
-                    Th("Actions", cls="text-left font-bold text-lg py-3 text-gray-600")
-                )
-            ),
-            Tbody(
-                *(Tr(
-                    Td(title['title'], cls="py-3 border-b border-base-300"),
-                    Td(title['subtitle'], cls="py-3 border-b border-base-300"),
-                    Td(Div(
-                        *(Div(
-                            theme_mapping.get(theme.strip(), theme.strip()[:6]),
-                            cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
-                        ) for theme in title['theme'].split(', ')),
-                        cls="flex flex-wrap"
-                    ), cls="py-3 border-b border-base-300"),
-                    Td(Div(title['status'].capitalize(), cls=f"badge {status_badge_colors[title['status'].lower()]} badge-sm text-sm"), cls="py-3 border-b border-base-300"),
-                    Td(title['inspiration'], cls="py-3 border-b border-base-300"),
-                    Td(
-                        Div(
-                            A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-sm btn-outline mr-2"),
-                            Button("Select", cls="btn btn-sm btn-primary text-white", hx_post=f"/select-title/{title['id']}", hx_target="closest tr", hx_swap="outerHTML"),
-                            cls="flex"
-                        ),
-                        cls="py-3 border-b border-base-300"
-                    )
-                ) for title in working_titles),
-                id=f"title-row-{title['id']}"
-            ),
-            cls="table w-full mb-8"
-        ),
         Div(
             Div(
                 Input(type="text", placeholder="Enter a new working title", cls="input input-bordered w-full max-w-md text-lg py-3"),
@@ -310,6 +280,53 @@ def get():
             A("View Prompts", href="/prompts", cls="btn btn-link btn-md ml-4"),
             A("Next", href="/outline", cls="btn btn-secondary text-white"),
             cls="mt-8 flex justify-between items-center"
+        ),
+        Div(
+            Div(
+                cls="overflow-x-auto",
+                contents=[
+                    Table(
+                        Thead(
+                            Tr(
+                                Th(),
+                                Th("Title", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                                Th("Subtitle", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                                Th("Themes", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                                Th("Current Status", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                                Th("Inspiration Source", cls="text-left font-bold text-lg py-3 text-gray-600"),
+                                Th("Actions", cls="text-left font-bold text-lg py-3 text-gray-600")
+                            )
+                        ),
+                        Tbody(
+                            *(Tr(
+                                Th(str(i + 1), cls="py-3 border-b border-base-300"),
+                                Td(title['title'], cls="py-3 border-b border-base-300"),
+                                Td(title['subtitle'], cls="py-3 border-b border-base-300"),
+                                Td(Div(
+                                    *(Div(
+                                        theme_mapping.get(theme.strip(), theme.strip()[:6]),
+                                        cls=f"badge {badge_colors[list(theme_mapping.keys()).index(theme.strip()) % len(badge_colors)]} badge-sm px-2 py-1 text-xs font-semibold mr-1 mb-1"
+                                    ) for theme in title['theme'].split(', ')),
+                                    cls="flex flex-wrap"
+                                ), cls="py-3 border-b border-base-300"),
+                                Td(Div(title['status'].capitalize(), cls=f"badge {status_badge_colors[title['status'].lower()]} badge-sm text-sm"), cls="py-3 border-b border-base-300"),
+                                Td(title['inspiration'], cls="py-3 border-b border-base-300"),
+                                Td(
+                                    Div(
+                                        A("Edit", href=f"/edit-title/{title['id']}", cls="btn btn-xs btn-outline mr-2"),
+                                        Button("Select", cls="btn btn-xs btn-primary text-white", hx_post=f"/select-title/{title['id']}", hx_target="closest tr", hx_swap="outerHTML"),
+                                        cls="flex"
+                                    ),
+                                    cls="py-3 border-b border-base-300"
+                                )
+                            ) for i, title in enumerate(working_titles)),
+                            id=f"title-row-{title['id']}"
+                        ),
+                        cls="table w-full mb-8"
+                    )
+                ]
+            ),
+            cls="mb-8"
         ),
         Script("""
         function filterTheme(theme) {
@@ -332,6 +349,7 @@ def select_title(title_id: int):
 
     # Create the updated row with a different background color
     return Tr(
+        Th(str(working_titles.index(selected_title) + 1), cls="py-3 border-b border-base-300"),
         Td(selected_title['title'], cls="py-3 border-b border-base-300"),
         Td(selected_title['subtitle'], cls="py-3 border-b border-base-300"),
         Td(Div(
@@ -345,13 +363,12 @@ def select_title(title_id: int):
         Td(selected_title['inspiration'], cls="py-3 border-b border-base-300"),
         Td(
             Div(
-                A("Edit", href=f"/edit-title/{selected_title['id']}", cls="btn btn-sm btn-outline mr-2"),
-                Button("Selected", cls="btn btn-sm btn-success text-white"),
+                A("Edit", href=f"/edit-title/{selected_title['id']}", cls="btn btn-xs btn-outline mr-2"),
+                Button("Selected", cls="btn btn-xs btn-success text-white"),
                 cls="flex"
             ),
             cls="py-3 border-b border-base-300"
         ),
-        id=f"title-row-{selected_title['id']}",
         cls="bg-base-200",  # Use DaisyUI theme color for selected row
         hx_trigger="load"
     )
@@ -493,11 +510,18 @@ def get():
 @app.get("/prompts")
 def get():
     title = PROMPTS
+    prompt_mapping = {
+        OUR_STRATEGY: OUR_STRATEGY_PROMPT,
+        WORKING_TITLES: WORKING_TITLES_PROMPT,
+        OUTLINE: OUTLINE_PROMPT,
+        FULL_TEXT: FULL_TEXT_PROMPT,
+        REUSE: REUSE_PROMPT
+    }
     content = Div(
         H1(title, cls="text-4xl font-bold mb-8"),
         *(Div(
             H2(f"{stage} Prompts", cls="text-2xl font-bold mb-2"),
-            Textarea(placeholder=f"Enter prompts for {stage}", cls="textarea textarea-bordered w-full h-32"),
+            Textarea(prompt_mapping[stage], cls="textarea textarea-bordered w-full h-32"),
             Div(
                 Button("Regenerate Prompt", cls="btn btn-primary text-white"),
                 Button("View Diff", cls="btn btn-outline ml-2"),
